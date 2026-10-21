@@ -63,8 +63,8 @@ test.describe('Login', () => {
     await expect(page.locator('#loginbtn')).toBeVisible();
   });
 
-  // ─── TC03 ─────────────────────────────────────────────────────────────────
-  test('TC03 - Logout', async ({ page }) => {
+  // ─── TC13 ─────────────────────────────────────────────────────────────────
+  test('TC13 - Logout', async ({ page }) => {
     await openLoginPage(page);
     await login(page, USERNAME, PASSWORD);
     await expect(page).toHaveURL(/\/my\//, { timeout: TIMEOUT });
@@ -96,6 +96,44 @@ test.describe('Login', () => {
 
     // The authenticated user menu is gone
     await expect(page.locator('#user-menu-toggle')).toHaveCount(0);
+  });
+
+  // ─── TC14 ─────────────────────────────────────────────────────────────────
+  test('TC14 - Forgot password page opens', async ({ page }) => {
+    await openLoginPage(page);
+
+    // Locate the forgot password link on the login page
+    const forgotPasswordLink = page.locator('a[href*="/login/forgot_password.php"]').or(
+      page.getByRole('link', { name: /lost password|forgot.*password|forgotten/i })
+    ).first();
+
+    await expect(forgotPasswordLink).toBeVisible({ timeout: TIMEOUT });
+    await forgotPasswordLink.click();
+
+    // Verify forgot password page URL and elements
+    await expect(page).toHaveURL(/\/login\/forgot_password\.php/, { timeout: TIMEOUT });
+    await page.waitForLoadState('domcontentloaded');
+
+    // Verify search by username or search by email fields / forms exist
+    const usernameSearch = page.locator('#id_username').or(page.locator('input[name="username"]'));
+    const emailSearch = page.locator('#id_email').or(page.locator('input[name="email"]'));
+    await expect(usernameSearch.or(emailSearch).first()).toBeVisible({ timeout: TIMEOUT });
+  });
+
+  // ─── TC15 ─────────────────────────────────────────────────────────────────
+  test('TC15 - Protected page redirects to login when logged out', async ({ page }) => {
+    // Attempt to access a protected area that requires authentication
+    const PROTECTED_URL = 'https://school.moodledemo.net/user/edit.php';
+
+    await page.goto(PROTECTED_URL, { waitUntil: 'domcontentloaded' });
+
+    // Verify unauthenticated user is redirected to the login page
+    await expect(page).toHaveURL(/\/login\/index\.php/, { timeout: TIMEOUT });
+
+    // Verify login form is displayed
+    await expect(page.locator('#username')).toBeVisible({ timeout: TIMEOUT });
+    await expect(page.locator('#password')).toBeVisible({ timeout: TIMEOUT });
+    await expect(page.locator('#loginbtn')).toBeVisible({ timeout: TIMEOUT });
   });
 
 });
