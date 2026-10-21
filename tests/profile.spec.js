@@ -35,7 +35,11 @@ test.describe('Profile & Account', () => {
     await page.locator('#id_submitbutton').click();
 
     // Saved -> redirected to the profile, where the new value is shown
-    await expect(page).toHaveURL(/\/user\/profile\.php/);
+        // Saved -> Moodle redirects to the preferences page (or the profile, depending on version)
+    await expect(page).toHaveURL(/\/user\/(preferences|profile)\.php/);
+
+    // Verify the new value on the profile page
+    await page.goto(`${BASE_URL}/user/profile.php`, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#region-main')).toContainText(newCity);
   });
 });
