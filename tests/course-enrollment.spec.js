@@ -1,12 +1,8 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-import { loginAsStudent } from './helpers/auth.js';
-
 const TIMEOUT = 60_000;
 
 async function openMyCourses(page) {
-  await loginAsStudent(page);
-
   await page.goto(
     'https://school.moodledemo.net/my/courses.php',
     {

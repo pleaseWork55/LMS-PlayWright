@@ -26,6 +26,8 @@ async function login(page, username, password) {
 }
 
 test.describe('Login', () => {
+  // Login tests must start logged out — ignore the shared session from the setup project.
+  test.use({ storageState: { cookies: [], origins: [] } });
 
   // ─── TC01 ─────────────────────────────────────────────────────────────────
   test('TC01 - Valid student login', async ({ page }) => {

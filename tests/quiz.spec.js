@@ -11,8 +11,6 @@
 //   6b. [TC08] Attempt → answer all → finish → submit → verify result page
 
 import { test, expect } from '@playwright/test';
-import { loginAsStudent } from './helpers/auth.js';
-
 const BASE_URL = 'https://school.moodledemo.net';
 const TIMEOUT = 60_000; // same generous timeout as auth.js (demo site can be slow)
 
@@ -159,9 +157,6 @@ test.describe('M3 – Quiz', () => {
 
   // Steps 1-2 shared by every test: Login → My Courses → first course
   test.beforeEach(async ({ page }) => {
-    await loginAsStudent(page); // Step 1 – Login
-    console.log('QuizTests beforeEach – login successful');
-
     await page.goto(`${BASE_URL}/my/courses.php`, { waitUntil: 'domcontentloaded' }); // Step 2 – My Courses
     console.log('QuizTests beforeEach – my courses page opened');
 

@@ -35,21 +35,43 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers.
+   * Each browser has a "setup-*" project that logs in once and saves the session to
+   * playwright/.auth/<browser>.json; the browser project depends on it and reuses that
+   * session via storageState. login.spec.js opts out and tests the real login flow. */
   projects: [
     {
-      name: 'chromium',
+      name: 'setup-chromium',
+      testMatch: /.*\.setup\.js/,
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'setup-firefox',
+      testMatch: /.*\.setup\.js/,
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'setup-webkit',
+      testMatch: /.*\.setup\.js/,
+      use: { ...devices['Desktop Safari'] },
+    },
+
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/chromium.json' },
+      dependencies: ['setup-chromium'],
     },
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { ...devices['Desktop Firefox'], storageState: 'playwright/.auth/firefox.json' },
+      dependencies: ['setup-firefox'],
     },
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: { ...devices['Desktop Safari'], storageState: 'playwright/.auth/webkit.json' },
+      dependencies: ['setup-webkit'],
     },
 
     /* Test against mobile viewports. */

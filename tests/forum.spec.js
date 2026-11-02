@@ -1,25 +1,10 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
 
-const LOGIN_URL = 'https://school.moodledemo.net/login/index.php';
 const FORUM_URL = 'https://school.moodledemo.net/mod/forum/view.php?id=706'; // Psychology in Cinema > Course discussion
-const USERNAME = 'student';
-const PASSWORD = 'moodle26';
 
 // Remote demo site can be slow — give assertions more headroom.
 const TIMEOUT = 60_000;
-
-/**
- * Log in as the student and wait for the Dashboard.
- */
-async function login(page) {
-  await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#username')).toBeVisible({ timeout: TIMEOUT });
-  await page.locator('#username').fill(USERNAME);
-  await page.locator('#password').fill(PASSWORD);
-  await page.locator('#loginbtn').click();
-  await expect(page).toHaveURL(/\/my\//, { timeout: TIMEOUT });
-}
 
 /**
  * Open the forum and wait until the "Add discussion topic" button is ready.
@@ -59,8 +44,11 @@ async function createPost(page, subject, message) {
 
   await page.locator('#id_submitbutton').click();
 
-  // Moodle confirms the post with an alert and returns to the forum
-  await expect(page.locator('.alert').filter({ hasText: 'Post added' }).first())
+  // Moodle returns to the forum list. We assert on the new discussion rather than the
+  // one-time "Post added" flash alert: that alert lives in the server-side session, and
+  // since all tests now share one logged-in session another worker can consume it first.
+  await expect(page).toHaveURL(/\/mod\/forum\/view\.php/, { timeout: TIMEOUT });
+  await expect(page.locator('a', { hasText: subject }).first())
     .toBeVisible({ timeout: TIMEOUT });
 }
 
@@ -81,7 +69,7 @@ test.describe('Forum', () => {
     const subject = `Automation post ${stamp}`;
     const message = `This post was created by Playwright automation (${stamp}).`;
 
-    await login(page);
+
     await createPost(page, subject, message);
 
     // The new discussion is listed in the forum
@@ -103,7 +91,7 @@ test.describe('Forum', () => {
     const message = `Original post for reply test (${stamp}).`;
     const reply = `This reply was added by Playwright automation (${stamp}).`;
 
-    await login(page);
+
     // Create our own post so the test does not depend on pre-existing data
     await createPost(page, subject, message);
     await openDiscussion(page, subject);
@@ -148,7 +136,7 @@ test.describe('Forum', () => {
     const newSubject = `${subject} EDITED`;
     const newMessage = `Message updated by Playwright automation (${stamp}).`;
 
-    await login(page);
+
     await createPost(page, subject, message);
     await openDiscussion(page, subject);
 
@@ -182,7 +170,7 @@ test.describe('Forum', () => {
     const subject = `Automation delete thread ${stamp}`;
     const message = `This post will be deleted (${stamp}).`;
 
-    await login(page);
+
     await createPost(page, subject, message);
     await openDiscussion(page, subject);
 

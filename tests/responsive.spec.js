@@ -1,15 +1,8 @@
 import { test, expect } from '@playwright/test';
 
-const LOGIN_URL = 'https://school.moodledemo.net/login/index.php';
-const USERNAME = 'student';
-const PASSWORD = 'moodle26';
-
+// Session is provided by the setup project (storageState); open the Dashboard directly.
 async function login(page) {
-  await page.goto(LOGIN_URL);
-
-  await page.locator('#username').fill(USERNAME);
-  await page.locator('#password').fill(PASSWORD);
-  await page.locator('#loginbtn').click();
+  await page.goto('https://school.moodledemo.net/my/');
 
   await expect(page).toHaveURL(/\/my\//);
 }

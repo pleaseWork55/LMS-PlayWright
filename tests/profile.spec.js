@@ -1,13 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { loginAsStudent } from './helpers/auth.js';
 
 const BASE_URL = 'https://school.moodledemo.net';
 
 test.describe('Profile & Account', () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAsStudent(page);
-  });
-
   test('View own profile', async ({ page }) => {
     await page.goto(`${BASE_URL}/user/profile.php`, { waitUntil: 'domcontentloaded' });
 

@@ -1,14 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { loginAsStudent } from './helpers/auth.js';
 
 const BASE_URL = 'https://school.moodledemo.net';
 
 test.describe('Calendar & Navigation', () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAsStudent(page);
-  });
-
   test('Main navigation links work', async ({ page }) => {
+    // Session comes from the setup project; start on the Dashboard
+    await page.goto(`${BASE_URL}/my/`, { waitUntil: 'domcontentloaded' });
     const nav = page.locator('.primary-navigation');
 
     // My courses
