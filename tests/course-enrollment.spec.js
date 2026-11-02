@@ -107,7 +107,7 @@ async function enrolIfRequired(page) {
   return false;
 }
 
-test.describe.serial('Course Tests', () => {
+test.describe('Course Tests', () => {
 
   // TC04: Open a course
   test(

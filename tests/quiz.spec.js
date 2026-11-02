@@ -260,6 +260,14 @@ test.describe('M3 – Quiz', () => {
 
     // No finished attempt yet? Make one (reuses the TC08 flow)
     if ((await reviewLink.count()) === 0) {
+      // Attempts used up and review disabled for this quiz: nothing to review or start
+      const attemptButton = page.getByRole('button', {
+        name: /attempt quiz|re-attempt quiz|continue your attempt/i,
+      });
+      test.skip(
+        (await attemptButton.count()) === 0,
+        'First quiz has no Review link and no attempts left (e.g. "Review not permitted")'
+      );
       await clickAttemptQuiz(page);
       await answerAllRemainingQuestions(page);
       await clickFinishAttempt(page);

@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test:all": "node scripts/run-browsers.js",
+    "test:chromium": "node scripts/run-browsers.js chromium",
+    "test:firefox": "node scripts/run-browsers.js firefox",
+    "test:webkit": "node scripts/run-browsers.js webkit"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SandipanChakraborty3/LMS-PlayWright.git"

@@ -16,14 +16,14 @@ export default defineConfig({
   testDir: './tests',
   /* Global timeout per test — the remote demo site can be slow */
   timeout: 90_000,
-  /* Run tests in files in parallel */
-  fullyParallel: true,
+  /* Run tests one by one, in order (no parallel execution within or across files) */
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Retry a failed test once (the demo site occasionally returns 502s/timeouts) */
+  retries: 1,
+  /* Single worker: login (setup) projects run first, then chromium, firefox and webkit in turn. */
+  workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -31,8 +31,11 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    /* Record a trace for every test (passed or failed). See https://playwright.dev/docs/trace-viewer */
+    trace: 'on',
+
+    /* Take a screenshot at the end of every test (passed or failed). */
+    screenshot: 'on',
   },
 
   /* Configure projects for major browsers.
